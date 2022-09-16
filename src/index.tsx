@@ -86,6 +86,49 @@ export function Component() {
     return () => clearInterval(poll);
   })
 
+  function checkDebugTargets() {
+    fetch(`${METRO_URL.toString()}json`)
+      .then((res) => res.json())
+      .then((result) => {
+        // We only want to use the Reanimated Reload targets.
+        const targets_ =result.filter(
+          (target: any) =>
+            target.title === 'Reanimated Runtime Experimental (Improved Chrome Reloads)'
+        );
+
+        // Find the currently selected target.
+        // If the current selectedTarget isn't returned, clear it.
+        let currentlySelected = null;
+        if (selectedTarget != null) {
+          for (const target of result) {
+            if (
+              selectedTarget.webSocketDebuggerUrl === target.webSocketDebuggerUrl
+            ) {
+              currentlySelected = selectedTarget;
+            }
+          }
+        }
+
+        // Auto-select the first target if there is one,
+        // but don't change the one that's already selected.
+        const selectedTarget_ =
+          currentlySelected == null && targets_.length === 1
+            ? targets_[0]
+            : currentlySelected;
+        
+        if (selectedTarget != selectedTarget_) {
+          setTargets(targets_);
+          setSelectedTarget(selectedTarget_);
+          setError(null);
+        }
+      })
+      .catch((error) => {
+        setSelectedTarget(null);
+        setTargets([]);
+        setError(error);
+      });
+  }
+
   function handleSelect(selectedTarget: Target) {
     setSelectedTarget(selectedTarget);
   }
@@ -112,45 +155,6 @@ export function Component() {
     } else {
       return null;
     }
-  }
-
-  function checkDebugTargets() {
-    fetch(`${METRO_URL.toString()}json`)
-      .then((res) => res.json())
-      .then((result) => {
-        // We only want to use the Chrome Reload targets.
-        setTargets(result.filter(
-          (target: any) =>
-            target.title === 'Reanimated Runtime Experimental (Improved Chrome Reloads)',
-        ));
-
-        // Find the currently selected target.
-        // If the current selectedTarget isn't returned, clear it.
-        let currentlySelected = null;
-        if (selectedTarget != null) {
-          for (const target of result) {
-            if (
-              selectedTarget.webSocketDebuggerUrl === target.webSocketDebuggerUrl
-            ) {
-              currentlySelected = selectedTarget;
-            }
-          }
-        }
-
-        // Auto-select the first target if there is one,
-        // but don't change the one that's already selected.
-        setSelectedTarget(
-          currentlySelected == null && targets.length === 1
-            ? targets[0]
-            : currentlySelected
-        );
-        setError(null);
-      })
-      .catch((error) => {
-        setSelectedTarget(null);
-        setTargets([]);
-        setError(error);
-      });
   }
 
   return (
