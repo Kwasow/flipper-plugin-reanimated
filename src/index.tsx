@@ -9,15 +9,12 @@
 
 import React, { useEffect, useState } from 'react';
 import {
-  FlipperDevicePlugin,
-  Device,
   styled,
   colors,
   FlexRow,
   FlexColumn,
 } from 'flipper';
 import LaunchScreen from './LaunchScreen';
-import Banner, {isBannerEnabled} from './Banner';
 import SelectScreen from './SelectScreen';
 import ErrorScreen from './ErrorScreen';
 import ChromeDevTools from './ChromeDevTools';
@@ -116,6 +113,7 @@ export function Component() {
             ? targets_[0]
             : currentlySelected;
         
+        // Only update the state if there was a change
         if (selectedTarget != selectedTarget_) {
           setTargets(targets_);
           setSelectedTarget(selectedTarget_);
@@ -135,16 +133,8 @@ export function Component() {
 
   function renderContent() {
     if (selectedTarget) {
-      let bannerMargin = null;
-      if (isBannerEnabled()) {
-        bannerMargin = '29px';
-      }
-
       return (
-        <ChromeDevTools
-          url={selectedTarget.devtoolsFrontendUrl}
-          marginTop={bannerMargin}
-        />
+        <ChromeDevTools url={selectedTarget.devtoolsFrontendUrl} />
       );
     } else if (targets != null && targets.length === 0) {
       return <LaunchScreen />;
@@ -159,7 +149,6 @@ export function Component() {
 
   return (
     <Container>
-      <Banner />
       <Content>{renderContent()}</Content>
     </Container>
   );
