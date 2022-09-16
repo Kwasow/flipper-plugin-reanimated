@@ -76,19 +76,14 @@ export function Component() {
   const [selectedTarget, setSelectedTarget] = useState<Target | null>(null)
   const [targets, setTargets] = useState<Target[]>([]);
   const [error, setError] = useState<Error | null>(null);
-  const [poll, setPoll] = useState<NodeJS.Timer | null>(null);
 
   useEffect(() => {
     // This is a pretty basic polling mechnaism. We ask Metro every POLL_SECS what the
     // current available targets are and only handle a few basic state transitions.
-    setPoll(setInterval(checkDebugTargets, POLL_SECS));
+    const poll = setInterval(checkDebugTargets, POLL_SECS);
     checkDebugTargets();
 
-    return () => {
-      if (poll != null) {
-        clearInterval(poll);
-      }
-    }
+    return () => clearInterval(poll);
   })
 
   function handleSelect(selectedTarget: Target) {
