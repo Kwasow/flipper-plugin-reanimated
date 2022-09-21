@@ -10,7 +10,7 @@
   "keywords": [
     "flipper-plugin"
   ],
-  "icon": "apps",
+  "icon": "code",
   "title": "Hermes Debugger (Reanimated)",
   "scripts": {
     "lint": "flipper-pkg lint",
