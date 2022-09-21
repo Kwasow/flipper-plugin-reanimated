@@ -61,13 +61,7 @@ const Container = styled(FlexColumn)({
   backgroundColor: colors.light02,
 });
 
-export function plugin(client: PluginClient<EventSource, {}>) {
-  // static supportsDevice(device: Device) {
-  //   return !device.isArchived && device.os === 'Metro';
-  // }
-
-  // client.supp
-}
+export function plugin(client: PluginClient<EventSource, {}>) {}
 
 export function Component() {
   const [selectedTarget, setSelectedTarget] = useState<Target | null>(null)
@@ -88,14 +82,14 @@ export function Component() {
       .then((res) => res.json())
       .then((result) => {
         // We only want to use the Reanimated Reload targets.
-        const targets_ =result.filter(
+        const targets_ = result.filter(
           (target: any) =>
             target.title === 'Reanimated Runtime Experimental (Improved Chrome Reloads)'
         );
 
         // Find the currently selected target.
         // If the current selectedTarget isn't returned, clear it.
-        let currentlySelected = null;
+        let currentlySelected: Target | null = null;
         if (selectedTarget != null) {
           for (const target of result) {
             if (
@@ -115,8 +109,12 @@ export function Component() {
         
         // Only update the state if there was a change
         if (selectedTarget != selectedTarget_) {
-          setTargets(targets_);
           setSelectedTarget(selectedTarget_);
+        }
+        if (targets != targets_) {
+          setTargets(targets_);
+        }
+        if (error != null) {
           setError(null);
         }
       })
