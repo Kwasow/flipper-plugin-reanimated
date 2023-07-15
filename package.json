@@ -2,8 +2,14 @@
   "$schema": "https://fbflipper.com/schemas/plugin-package/v2.json",
   "name": "flipper-plugin-reanimated",
   "id": "React",
-  "version": "1.0.1",
-  "pluginType": "client",
+  "version": "1.1.0",
+  "pluginType": "device",
+  "supportedDevices": [
+    {
+      "os": "Metro",
+      "archived": false
+    }
+  ],
   "main": "dist/bundle.js",
   "flipperBundlerEntry": "src/index.tsx",
   "license": "MIT",
@@ -20,7 +26,7 @@
   },
   "peerDependencies": {
     "@emotion/styled": "latest",
-    "flipper-plugin": "^0.164.0",
+    "flipper-plugin": "*",
     "antd": "latest",
     "react": "latest",
     "react-dom": "latest"
