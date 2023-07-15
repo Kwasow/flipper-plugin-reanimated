@@ -63,7 +63,7 @@ export default function SelectScreen(props: Props) {
   return (
     <Container>
       <Welcome>
-        <Title>Reanimated Hermes Debugger Select</Title>
+        <Title>Hermes Debugger Select</Title>
         <Item>
           <FlexColumn>
             <ItemTitle>Please select a target:</ItemTitle>

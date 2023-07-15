@@ -6,7 +6,7 @@ tool, which allows for debugging React Native apps using the Reanimated package.
 It is mainly based on the hermesdebuggerrn plugin that is bundled with Flipper,
 but with a few minor changes that are needed for our use-case.
 
-*This version of the plugin is based on https://github.com/facebook/flipper/commit/95af1428ce720101d76e33427608c449ff0846df*
+*This version of the plugin is based on https://github.com/facebook/flipper/commit/c8776175c34d2574c7ee056bbf3c4d26dc9332be
 
 ## Development
 

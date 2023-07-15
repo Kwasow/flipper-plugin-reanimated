@@ -7,18 +7,20 @@
  * @format
  */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
+  FlipperDevicePlugin,
+  Device,
   styled,
   colors,
   FlexRow,
   FlexColumn,
 } from 'flipper';
 import LaunchScreen from './LaunchScreen';
+import Banner, {isBannerEnabled} from './Banner';
 import SelectScreen from './SelectScreen';
 import ErrorScreen from './ErrorScreen';
 import ChromeDevTools from './ChromeDevTools';
-import { PluginClient } from 'flipper-plugin';
 
 const POLL_SECS = 5 * 1000;
 const METRO_PORT_ENV_VAR = process.env.METRO_SERVER_PORT || '8081';
@@ -61,83 +63,100 @@ const Container = styled(FlexColumn)({
   backgroundColor: colors.light02,
 });
 
-export function plugin(client: PluginClient<EventSource, {}>) {}
+export default class extends FlipperDevicePlugin<State, any, any> {
+  static supportsDevice(device: Device) {
+    return !device.isArchived && device.os === 'Metro';
+  }
 
-export function Component() {
-  const [selectedTarget, setSelectedTarget] = useState<Target | null>(null)
-  const [targets, setTargets] = useState<Target[]>([]);
-  const [error, setError] = useState<Error | null>(null);
+  state: State = {
+    targets: null,
+    selectedTarget: null,
+    error: null,
+  };
 
-  useEffect(() => {
+  poll?: NodeJS.Timeout;
+
+  componentDidMount() {
     // This is a pretty basic polling mechnaism. We ask Metro every POLL_SECS what the
     // current available targets are and only handle a few basic state transitions.
-    const poll = setInterval(checkDebugTargets, POLL_SECS);
-    checkDebugTargets();
+    this.poll = setInterval(this.checkDebugTargets, POLL_SECS);
+    this.checkDebugTargets();
+  }
 
-    return () => clearInterval(poll);
-  })
+  componentWillUnmount() {
+    if (this.poll) {
+      clearInterval(this.poll);
+    }
+  }
 
-  function checkDebugTargets() {
+  checkDebugTargets = () => {
     fetch(`${METRO_URL.toString()}json`)
       .then((res) => res.json())
       .then((result) => {
-        // We only want to use the Reanimated Reload targets.
-        const targets_ = result.filter(
+        // We only want to use the Chrome Reload targets.
+        const targets = result.filter(
           (target: any) =>
-            target.title === 'Reanimated Runtime Experimental (Improved Chrome Reloads)'
+            target.title ===
+            'React Native Experimental (Improved Chrome Reloads)',
         );
 
         // Find the currently selected target.
         // If the current selectedTarget isn't returned, clear it.
-        let currentlySelected: Target | null = null;
-        if (selectedTarget != null) {
+        let currentlySelected = null;
+        if (this.state.selectedTarget != null) {
           for (const target of result) {
             if (
-              selectedTarget.webSocketDebuggerUrl === target.webSocketDebuggerUrl
+              this.state.selectedTarget?.webSocketDebuggerUrl ===
+              target.webSocketDebuggerUrl
             ) {
-              currentlySelected = selectedTarget;
+              currentlySelected = this.state.selectedTarget;
             }
           }
         }
 
         // Auto-select the first target if there is one,
         // but don't change the one that's already selected.
-        const selectedTarget_ =
-          currentlySelected == null && targets_.length === 1
-            ? targets_[0]
+        const selectedTarget =
+          currentlySelected == null && targets.length === 1
+            ? targets[0]
             : currentlySelected;
-        
-        // Only update the state if there was a change
-        if (selectedTarget != selectedTarget_) {
-          setSelectedTarget(selectedTarget_);
-        }
-        if (targets != targets_) {
-          setTargets(targets_);
-        }
-        if (error != null) {
-          setError(null);
-        }
+
+        this.setState({
+          error: null,
+          targets,
+          selectedTarget,
+        });
       })
       .catch((error) => {
-        setSelectedTarget(null);
-        setTargets([]);
-        setError(error);
+        this.setState({
+          targets: null,
+          selectedTarget: null,
+          error,
+        });
       });
-  }
+  };
 
-  function handleSelect(selectedTarget: Target) {
-    setSelectedTarget(selectedTarget);
-  }
+  handleSelect = (selectedTarget: Target) => this.setState({selectedTarget});
 
-  function renderContent() {
+  renderContent() {
+    const {error, selectedTarget, targets} = this.state;
+
     if (selectedTarget) {
+      let bannerMargin = null;
+      if (isBannerEnabled()) {
+        bannerMargin = '29px';
+      }
+
       return (
-        <ChromeDevTools url={selectedTarget.devtoolsFrontendUrl} />
+        <ChromeDevTools
+          url={selectedTarget.devtoolsFrontendUrl}
+          marginTop={bannerMargin}
+        />
       );
     } else if (targets != null && targets.length === 0) {
       return <LaunchScreen />;
     } else if (targets != null && targets.length > 0) {
-      return <SelectScreen targets={targets} onSelect={handleSelect} />;
+      return <SelectScreen targets={targets} onSelect={this.handleSelect} />;
     } else if (error != null) {
       return <ErrorScreen error={error} />;
     } else {
@@ -145,9 +164,12 @@ export function Component() {
     }
   }
 
-  return (
-    <Container>
-      <Content>{renderContent()}</Content>
-    </Container>
-  );
+  render() {
+    return (
+      <Container>
+        <Banner />
+        <Content>{this.renderContent()}</Content>
+      </Container>
+    );
+  }
 }

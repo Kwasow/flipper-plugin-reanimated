@@ -97,7 +97,7 @@ export default function ErrorScreen(props: Props) {
   return (
     <Container>
       <Welcome>
-        <Title>Reanimated Hermes Debugger Error</Title>
+        <Title>Hermes Debugger Error</Title>
         <Item>
           <Icon size={20} name="caution-octagon" color={colors.red} />
           <FlexColumn>{getReason(props.error)}</FlexColumn>

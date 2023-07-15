@@ -66,7 +66,7 @@ export default function LaunchScreen() {
           <Icon size={20} name="question-circle" color={colors.info} />
           <FlexColumn>
             <ItemTitle>
-              <Bold>Metro is connected but no Reanimated (Hermes) apps were found.</Bold>{' '}
+              <Bold>Metro is connected but no Hermes apps were found.</Bold>{' '}
               Open a React Native screen with Hermes enabled to connect. Note:
               you may need to reload the app in order to reconnect the device to
               Metro.

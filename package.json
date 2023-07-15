@@ -16,8 +16,7 @@
     "lint": "flipper-pkg lint",
     "prepack": "flipper-pkg lint && flipper-pkg bundle",
     "build": "flipper-pkg bundle",
-    "watch": "flipper-pkg bundle --watch",
-    "test": "jest --no-watchman"
+    "watch": "flipper-pkg bundle --watch"
   },
   "peerDependencies": {
     "@emotion/styled": "latest",
@@ -30,23 +29,13 @@
     "@babel/preset-react": "latest",
     "@babel/preset-typescript": "latest",
     "@emotion/styled": "latest",
-    "@testing-library/react": "latest",
-    "@types/jest": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "antd": "latest",
     "flipper-plugin": "latest",
     "flipper-pkg": "latest",
-    "jest": "latest",
-    "jest-mock-console": "latest",
     "react": "latest",
     "react-dom": "latest",
     "typescript": "latest"
-  },
-  "jest": {
-    "testEnvironment": "jsdom",
-    "setupFiles": [
-      "<rootDir>/jest-setup.ts"
-    ]
   }
 }
